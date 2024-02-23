@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+<launch>
+    <param name="robot_description" command="xacro '$(find 285610)/urdf/my_robots_super_model.urdf.xacro'" />
+
+    <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+     -->
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find 285610)/worlds/simple_scene.world"/>
+        <arg name="paused" value="true"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <node name="my_robot_model_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+    args="-urdf -param robot_description -model 285610" />
+
+    <param name="robot_description" command="xacro '$(find 285610)/urdf/my_robots_super_model.urdf.xacro'" />
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find 285610)/config/diff_control.yaml" command="load"/>
+
+    <!-- load the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/285610_robot" args="
+        joint_l_f_velocity_controller 
+        joint_l_b_velocity_controller 
+        joint_r_f_velocity_controller 
+        joint_r_b_velocity_controller 
+        joint_turret_position_controller  
+        joint_forearm_position_controller
+        joint_prism_position_controller
+        joint_state_controller
+        --timeout 60"/>
+
+    <!-- convert joint states to TF transforms for rviz, etc -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
+        <param name="publish_frequency" type="double" value="40.0" />
+        <remap from="/joint_states" to="/285610_robot/joint_states" />
+    </node>
+
+    <node pkg="285610" type="robot_controller.py" name="lab4_controller" output="screen"/>
+    
+</launch>

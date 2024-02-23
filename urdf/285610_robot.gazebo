@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<robot>
+  <!-- Setting colors for Gazebo -->
+  <gazebo reference="base_link">
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <gazebo reference="counterweight">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="forearm">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+  <gazebo reference="wheel_1">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel_2">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel_3">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel_4">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="prism_part">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <!-- Camera -->
+  <gazebo reference="camera">
+    <material>Gazebo/Black</material>
+    <sensor type="camera" name="camera1">
+    <update_rate>30.0</update_rate>
+    <camera name="head">
+      <horizontal_fov>1.3962634</horizontal_fov>
+      <image>
+        <width>800</width>
+        <height>600</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.08</near>
+        <far>300</far>
+      </clip>
+    </camera>
+
+    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>0.0</updateRate>
+      <cameraName>285610/camera1</cameraName>
+      <!-- <imageTopicName>image_raw</imageTopicName>
+      <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+      <frameName>camera_optical</frameName>
+      <hackBaseline>0.07</hackBaseline>
+      <distortionK1>0.0</distortionK1>
+      <distortionK2>0.0</distortionK2>
+      <distortionK3>0.0</distortionK3>
+      <distortionT1>0.0</distortionT1>
+      <distortionT2>0.0</distortionT2> -->
+    </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Lidar_l -->
+  <gazebo reference="lidar_l">
+  <material>Gazebo/Green</material>
+  <sensor type="ray" name="head_l_lidar_sensor">
+    <pose>0 0 0 0 0 1.57</pose>
+    <visualize>true</visualize>
+    <update_rate>40</update_rate>
+    <ray>
+      <scan>
+        <horizontal>
+          <samples>720</samples>
+          <resolution>1</resolution>
+          <min_angle>-0.01</min_angle>
+          <max_angle>0.01</max_angle>
+        </horizontal>
+      </scan>
+      <range>
+        <min>0.06</min>
+        <max>2.0</max>
+        <resolution>0.01</resolution>
+      </range>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.01</stddev>
+      </noise>
+    </ray>
+    <plugin name="gazebo_ros_head_lidar_controller" filename="libgazebo_ros_laser.so">
+      <topicName>/285610_robot/laser_l/scan</topicName>
+      <frameName>lidar_l_link</frameName>
+    </plugin>
+  </sensor>
+  </gazebo>
+
+  <!-- Lidar_r -->
+  <gazebo reference="lidar_r">
+  <material>Gazebo/Green</material>
+  <sensor type="ray" name="head_r_lidar_sensor">
+    <pose>0 0 0 0 0 -1.57</pose>
+    <visualize>true</visualize>
+    <update_rate>40</update_rate>
+    <ray>
+      <scan>
+        <horizontal>
+          <samples>20</samples>
+          <resolution>1</resolution>
+          <min_angle>-0.01</min_angle>
+          <max_angle>0.01</max_angle>
+        </horizontal>
+      </scan>
+      <range>
+        <min>0.06</min>
+        <max>2.0</max>
+        <resolution>0.01</resolution>
+      </range>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.01</stddev>
+      </noise>
+    </ray>
+    <plugin name="gazebo_ros_head_lidar_controller" filename="libgazebo_ros_laser.so">
+      <topicName>/285610_robot/laser_r/scan</topicName>
+      <frameName>lidar_r_link</frameName>
+    </plugin>
+  </sensor>
+  </gazebo>
+
+  <!-- gazebo_ros_control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/285610_robot</robotNamespace>
+    </plugin>
+  </gazebo>
+
+</robot>

@@ -1,0 +1,448 @@
+<?xml version='1.0'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="project_robot">
+    
+    <!-- Importing other files -->
+    <xacro:include filename="$(find 285610)/urdf/materials.xacro" />
+    <xacro:include filename="$(find 285610)/urdf/inertial.urdf.xacro" />
+    <xacro:include filename="$(find 285610)/urdf/285610_robot.gazebo" />
+    
+    <!-- Body dimentions -->
+    <!-- <xacro:property name="body_x" value="0.3" /> -->
+    <xacro:property name="body_x" value="0.15" />
+    <xacro:property name="body_y" value="0.14" />
+    <xacro:property name="body_z" value="0.03" />
+
+    <!-- Wheel dimentions -->
+    <!-- <xacro:property name="wheel_r" value="0.05" /> -->
+    <xacro:property name="wheel_r" value="0.03" />
+    <xacro:property name="wheel_l" value="0.02" />
+    <xacro:property name="wheel_x" value="${body_x/2.0-wheel_r}" />
+    <xacro:property name="wheel_y" value="${body_y/2.0+wheel_l/2.0}" />
+    <xacro:property name="wheel_z" value="${-body_z/2.0}" />
+
+    <!-- Upper arm dimentions -->
+    <xacro:property name="upper_arm_x" value="0.14" />
+    <xacro:property name="upper_arm_y" value="0.02" />
+    <xacro:property name="upper_arm_z" value="0.02" />
+
+    <!-- Forearm dimentions -->
+    <xacro:property name="forearm_x" value="0.08" />
+    <xacro:property name="forearm_y" value="0.02" />    
+    <xacro:property name="forearm_z" value="0.02" /> 
+
+    <!-- Prism part dimentions -->
+    <xacro:property name="prism_part_x" value="0.09" />
+    <xacro:property name="prism_part_y" value="0.01" />    
+    <xacro:property name="prism_part_z" value="0.01" /> 
+
+    <!-- Smasher dimentions -->
+    <xacro:property name="smasher_x" value="0.02" />
+    <xacro:property name="smasher_y" value="0.02" />    
+    <xacro:property name="smasher_z" value="0.02" /> 
+
+    <!-- Counterweight dimentions -->
+    <xacro:property name="counterweight_x" value="0.06" />
+    <xacro:property name="counterweight_y" value="0.06" />    
+    <xacro:property name="counterweight_z" value="0.06" /> 
+
+    <!-- Camera dimentions -->
+    <xacro:property name="camera_x" value="0.01" />
+    <xacro:property name="camera_y" value="0.01" />    
+    <xacro:property name="camera_z" value="0.01" /> 
+
+    <!-- Camera dimentions -->
+    <xacro:property name="lidar_x" value="0.02" />
+    <xacro:property name="lidar_y" value="0.01" />    
+    <xacro:property name="lidar_z" value="0.01" /> 
+
+    <!-- Material density -->
+    <xacro:property name="body_density" value="2710.0" />
+    <xacro:property name="wheel_density" value="2710.0" />
+    <xacro:property name="upper_arm_density" value="2710.0" />
+    <xacro:property name="forearm_density" value="2710.0" />
+    <xacro:property name="prism_part_density" value="2710.0" />
+    <xacro:property name="smasher_density" value="2710.0" />
+    <xacro:property name="counterweight_density" value="2710.0" />
+    <xacro:property name="camera_density" value="1000.0" />
+    <xacro:property name="lidar_density" value="1000.0" />
+    
+    <!-- Pi constant -->
+    <xacro:property name="Pi" value="3.14159265" />
+
+    <!-- Masses -->
+    <xacro:property name="body_mass" value="${body_density*body_x*body_y*body_z}" />
+    <xacro:property name="wheel_mass" value="${wheel_density*Pi*wheel_r*wheel_r*wheel_l}" />
+    <xacro:property name="upper_arm_mass" value="${upper_arm_density*upper_arm_x*upper_arm_y*upper_arm_z}" />
+    <xacro:property name="forearm_mass" value="${forearm_density*forearm_x*forearm_y*forearm_z}" />
+    <xacro:property name="prism_part_mass" value="${prism_part_density*prism_part_x*prism_part_y*prism_part_z}" />
+    <xacro:property name="smasher_mass" value="${smasher_density*smasher_x*smasher_y*smasher_z}" />
+    <xacro:property name="counterweight_mass" value="${counterweight_density*counterweight_x*counterweight_y*counterweight_z}" />
+    <xacro:property name="camera_mass" value="${camera_density*camera_x*camera_y*camera_z}" />
+    <xacro:property name="lidar_mass" value="${lidar_density*lidar_x*lidar_y*lidar_z}" />
+
+    <!-- Defining wheel -->
+    <xacro:macro name="define_wheel" params="x y z name">
+        <link name='wheel_${name}'>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 ${Pi/2} 0"/>
+                <geometry>
+                    <cylinder length="${wheel_l}" radius="${wheel_r}"/>
+                </geometry>
+                <material name="orange"/>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="0 ${Pi/2} 0"/>
+                <geometry>
+                    <cylinder length="${wheel_l}" radius="${wheel_r}"/>
+                </geometry>
+            </collision>
+            <xacro:inertial_cylinder length="${wheel_l}" radius="${wheel_r}" mass="${wheel_mass}">
+                <origin xyz="0 0 0" rpy="0 ${Pi/2} 0"/>
+            </xacro:inertial_cylinder>
+        </link>
+
+        <joint type="continuous" name="wheel_${name}_joint">
+            <origin xyz="${x} ${y} ${z}" rpy="0 0 ${Pi/2}"/>
+            <child link="wheel_${name}"/>
+            <parent link="base_link"/>
+        </joint>
+    </xacro:macro>
+
+
+    <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+    <!-- Links start here -->
+    <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+    <link name="world_link" />
+
+    <joint name="world_link_joint" type="fixed">
+        <origin xyz="0.0 0.0 -0.6" rpy="0.0 0.0 0.0"/>
+        <parent link="world_link"/>
+        <child link="base_link"/>
+    </joint>
+
+    <link name='base_link'>
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${body_x} ${body_y} ${body_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${body_x} ${body_y} ${body_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${body_x}" y="${body_y}" z="${body_z}" mass="${body_mass}">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- Wheels -->
+    <xacro:define_wheel x="${wheel_x}" y="${wheel_y}" z="${wheel_z}" name="1"/>
+    <xacro:define_wheel x="-${wheel_x}" y="${wheel_y}" z="${wheel_z}" name="2"/>
+    <xacro:define_wheel x="${wheel_x}" y="-${wheel_y}" z="${wheel_z}" name="3"/>
+    <xacro:define_wheel x="-${wheel_x}" y="-${wheel_y}" z="${wheel_z}" name="4"/>
+
+    <!-- Upper arm -->
+    <link name="upper_arm">
+        <visual>
+            <origin xyz="${body_x/3} ${upper_arm_y/2} ${upper_arm_z/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${upper_arm_x} ${upper_arm_y} ${upper_arm_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="${body_x/3} ${upper_arm_y/2} ${upper_arm_z/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${upper_arm_x} ${upper_arm_y} ${upper_arm_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${upper_arm_x}" y="${upper_arm_y}" z="${upper_arm_z}" mass="${upper_arm_mass}">
+            <origin xyz="${body_x/3} ${upper_arm_y/2} ${upper_arm_z/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="revolute" name="upper_arm_joint" >
+        <origin xyz="0 0 ${body_z/2}" rpy="0 0 0"/>
+        <child link="upper_arm"/>
+        <parent link="base_link"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="${-Pi}" upper="${Pi}" effort="1" velocity="10"/>
+    </joint>
+
+
+    <!-- Forearm -->
+    <link name="forearm">
+        <visual>
+            <origin xyz="${forearm_x/2-forearm_y/2} ${-forearm_y/2} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${forearm_x} ${forearm_y} ${forearm_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="${forearm_x/2-forearm_y/2} ${-forearm_y/2} 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${forearm_x} ${forearm_y} ${forearm_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${forearm_x}" y="${forearm_y}" z="${forearm_z}" mass="${forearm_mass}">
+            <origin xyz="${forearm_x/2-forearm_y/2} ${-forearm_y/2} 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="revolute" name="forearm_joint" >
+        <origin xyz="${body_x/3+upper_arm_x/2-upper_arm_y/2} 0 ${upper_arm_z/2}" rpy="0 0 0"/>
+        <parent link="upper_arm"/>
+        <child link="forearm"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="${-Pi}" upper="${Pi/2}" effort="1" velocity="10"/>
+    </joint>
+
+
+    <!-- Prism part -->
+    <link name="prism_part">
+        <visual>
+            <origin xyz="${prism_part_x/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${prism_part_x} ${prism_part_y} ${prism_part_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${prism_part_x} ${prism_part_y} ${prism_part_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${prism_part_x}" y="${prism_part_y}" z="${prism_part_z}" mass="${prism_part_mass}">
+            <origin xyz="${prism_part_x/2} 0 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="prismatic" name="prism_part_joint" >
+        <origin xyz="${forearm_y/2} ${-forearm_y/2} 0" rpy="0 0 0"/>
+        <parent link="forearm"/>
+        <child link="prism_part"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="0" upper="${prism_part_x/2}" effort="1" velocity="10"/>
+    </joint>
+
+    <!-- Smasher -->
+    <link name="smasher">
+        <visual>
+            <origin xyz="${smasher_x/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${smasher_x} ${smasher_y} ${smasher_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${smasher_x} ${smasher_y} ${smasher_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${smasher_x}" y="${smasher_y}" z="${smasher_z}" mass="${smasher_mass}">
+            <origin xyz="${smasher_x/2} 0 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="revolute" name="smasher_joint" >
+        <origin xyz="${prism_part_x} 0 0" rpy="0 0 0"/>
+        <parent link="prism_part"/>
+        <child link="smasher"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="${-Pi}" upper="${Pi}" effort="1" velocity="10"/>
+    </joint>
+
+    <!-- Counterweight -->
+    <link name="counterweight">
+        <visual>
+            <origin xyz="${-counterweight_x/2} 0 ${counterweight_z/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${counterweight_x} ${counterweight_y} ${counterweight_z}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="${-counterweight_x/2} 0 ${counterweight_z/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${counterweight_x} ${counterweight_y} ${counterweight_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${counterweight_x}" y="${counterweight_y}" z="${counterweight_z}" mass="${counterweight_mass}">
+            <origin xyz="${-counterweight_x/2} 0 ${counterweight_z/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="fixed" name="counterweight_joint" >
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <parent link="upper_arm"/>
+        <child link="counterweight"/>
+        <limit lower="${-Pi}" upper="${Pi}" effort="1" velocity="10"/>
+    </joint>
+
+    <!-- Camera -->
+    <link name="camera">
+        <visual>
+            <origin xyz="${counterweight_x/2-camera_x/2} ${-camera_y/2} ${camera_z/2}" rpy=" 0 0 0"/>
+            <geometry>
+                <box size="${camera_x} ${camera_y} ${camera_z}"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <origin xyz="${counterweight_x/2-camera_x/2} ${-camera_y/2} ${camera_z/2}" rpy=" 0 0 0"/>
+            <geometry>
+                <box size="${camera_x} ${camera_y} ${camera_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${camera_x}" y="${camera_y}" z="${camera_z}" mass="${camera_mass}">
+            <origin xyz="${counterweight_x/2-camera_x/2} ${-camera_y/2} ${camera_z/2}" rpy=" 0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="fixed" name="camera_joint">
+        <origin xyz="${-counterweight_x/2} 0 ${counterweight_z}" rpy="0 0 0"/>
+        <child link="camera"/>
+        <parent link="counterweight"/>
+    </joint>
+
+    <!-- Lidar_l -->
+    <link name="lidar_l">
+        <visual>
+            <origin xyz="0 ${counterweight_y/2-lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${Pi/2}"/>
+            <geometry>
+                <box size="${lidar_x} ${lidar_y} ${lidar_z}"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <origin xyz="0 ${counterweight_y/2-lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${Pi/2}"/>
+            <geometry>
+                <box size="${lidar_x} ${lidar_y} ${lidar_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${lidar_x}" y="${lidar_y}" z="${lidar_z}" mass="${lidar_mass}">
+            <origin xyz="0 ${counterweight_y/2-lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${Pi/2}"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="fixed" name="lidar_l_joint">
+        <origin xyz="${-counterweight_x/2} 0 ${counterweight_z}" rpy="0 0 0"/>
+        <child link="lidar_l"/>
+        <parent link="counterweight"/>
+    </joint>
+
+
+    <!-- Lidar_r -->
+    <link name="lidar_r">
+        <visual>
+            <origin xyz="0 ${-counterweight_y/2+lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${-Pi/2}"/>
+            <geometry>
+                <box size="${lidar_x} ${lidar_y} ${lidar_z}"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+        <collision>
+            <origin xyz="0 ${-counterweight_y/2+lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${-Pi/2}"/>
+            <geometry>
+                <box size="${lidar_x} ${lidar_y} ${lidar_z}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box x="${lidar_x}" y="${lidar_y}" z="${lidar_z}" mass="${lidar_mass}">
+            <origin xyz="0 ${-counterweight_y/2+lidar_y/2} ${lidar_z/2}" rpy=" 0 0 ${-Pi/2}"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint type="fixed" name="lidar_r_joint">
+        <origin xyz="${-counterweight_x/2} 0 ${counterweight_z}" rpy="0 0 0"/>
+        <child link="lidar_r"/>
+        <parent link="counterweight"/>
+    </joint>
+
+    <!-- Transmission -->
+    <transmission name="wheel_l_f_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="wheel_1_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="wheel_l_f_motor">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="wheel_l_b_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="wheel_2_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="wheel_l_b_motor">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="wheel_r_f_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="wheel_3_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="wheel_r_f_motor">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="wheel_r_b_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="wheel_4_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="wheel_r_b_motor">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="turret_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="upper_arm_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="turret_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="forearm_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="forearm_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="forearm_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="prismatic_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="prism_part_joint">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="prismatic_motor">
+            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+</robot>
